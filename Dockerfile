@@ -11,7 +11,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o rpc-proxy ./cmd/proxy
 
 # Stage 2 — minimal runtime image
-FROM alpine:3.19
+FROM alpine:3.22.4
 
 WORKDIR /app
 
