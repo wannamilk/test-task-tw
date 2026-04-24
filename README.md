@@ -1,18 +1,18 @@
 # Blockchain RPC Proxy
 
-A lightweight JSON-RPC 2.0 reverse proxy for [polygon.drpc.org](https://polygon.drpc.org), written in Go.
+A lightweight JSON-RPC 2.0 reverse proxy for [polygon.drpc.org](https://polygon.drpc.org), written in Go and deployed to AWS ECS Fargate via Terraform.
 
 ## What it does
 
-Exposes the same JSON-RPC interface as the upstream Polygon node — single and batch requests both supported. Clients connect to the proxy exactly as they would connect to the node directly.
+Forwards JSON-RPC calls transparently to the upstream Polygon node. Supports single and batch requests. Clients connect to the proxy exactly as they would connect to the node directly.
 
-## Run locally
+
+## Quick start
 
 ```bash
+# Run locally
 go run ./cmd/proxy
-```
 
-```bash
 # Single request
 curl -X POST http://localhost:8080 \
   -H 'Content-Type: application/json' \
@@ -34,18 +34,23 @@ curl http://localhost:8080/healthz
 | `UPSTREAM_URL` | `https://polygon.drpc.org` | Upstream RPC node URL |
 | `LISTEN_ADDR`  | `:8080`                    | Listen address        |
 
-## Run tests
+## Make commands
+
+| Command           | Description                                      |
+|-------------------|--------------------------------------------------|
+| `make test`       | Run all tests                                    |
+| `make build`      | Build binary locally                             |
+| `make docker-build` | Build Docker image                             |
+| `make docker-run` | Run Docker container                             |
+| `make ci`         | Full pipeline: test → build → docker → smoke test |
+
+## Run full CI pipeline
 
 ```bash
-go test -v ./...
+make ci
 ```
 
-## Docker
-
-```bash
-docker build -t rpc-proxy .
-docker run -p 8080:8080 rpc-proxy
-```
+This runs tests, builds the binary, builds the Docker image, starts the container, hits `/healthz` and `eth_blockNumber` against the real Polygon node, then stops the container.
 
 ## Deploy to AWS
 
